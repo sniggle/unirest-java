@@ -28,9 +28,6 @@ package com.mashape.unirest.test.http;
 import com.mashape.unirest.http.*;
 import com.mashape.unirest.http.async.Callback;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.http.options.Options;
-import com.mashape.unirest.request.GetRequest;
-import com.mashape.unirest.request.HttpRequest;
 import com.mashape.unirest.test.helper.GetResponse;
 import com.mashape.unirest.test.helper.JacksonObjectMapper;
 

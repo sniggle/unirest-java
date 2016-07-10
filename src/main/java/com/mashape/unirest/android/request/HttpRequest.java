@@ -23,24 +23,19 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.mashape.unirest.request;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+package com.mashape.unirest.android.request;
 
 import com.mashape.unirest.http.HttpMethod;
 import com.mashape.unirest.http.utils.Base64Coder;
 import com.mashape.unirest.http.utils.URLParamEncoder;
 import com.mashape.unirest.request.body.Body;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HttpRequest extends BaseRequest {
 
@@ -85,7 +80,7 @@ public class HttpRequest extends BaseRequest {
 
 	public HttpRequest headers(Map<String, String> headers) {
 		if (headers != null) {
-			for (Map.Entry<String, String> entry : headers.entrySet()) {
+			for (Entry<String, String> entry : headers.entrySet()) {
 				header(entry.getKey(), entry.getValue());
 			}
 		}

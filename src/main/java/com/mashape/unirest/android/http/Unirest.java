@@ -1,3 +1,5 @@
+package com.mashape.unirest.android.http;
+
 /*
 The MIT License
 
@@ -23,44 +25,31 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.mashape.unirest.http;
-
-import com.mashape.unirest.http.async.utils.AsyncIdleConnectionMonitorThread;
-import com.mashape.unirest.http.options.Option;
-import com.mashape.unirest.http.options.Options;
-import com.mashape.unirest.http.utils.SyncIdleConnectionMonitorThread;
-import com.mashape.unirest.request.GetRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
+import com.mashape.unirest.android.http.options.Option;
+import com.mashape.unirest.android.http.options.Options;
+import com.mashape.unirest.android.request.GetRequest;
+import com.mashape.unirest.android.request.HttpRequestWithBody;
+import com.mashape.unirest.http.HttpMethod;
+import com.mashape.unirest.http.ObjectMapper;
 import org.apache.http.HttpHost;
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Unirest {
 
 	/**
-	 * Set the HttpClient implementation to use for every synchronous request
-	 */
+		* Set the HttpClient implementation to use for every synchronous request
+		*/
 	public static void setHttpClient(HttpClient httpClient) {
 		Options.setOption(Option.HTTPCLIENT, httpClient);
 		Options.customClientSet();
 	}
 
 	/**
-	 * Set the asynchronous AbstractHttpAsyncClient implementation to use for every asynchronous request
-	 */
-	public static void setAsyncHttpClient(CloseableHttpAsyncClient asyncHttpClient) {
-		Options.setOption(Option.ASYNCHTTPCLIENT, asyncHttpClient);
-		Options.customClientSet();
-	}
-
-	/**
-	 * Set a proxy
-	 */
+		* Set a proxy
+		*/
 	public static void setProxy(HttpHost proxy) {
 		Options.setOption(Option.PROXY, proxy);
 
@@ -69,23 +58,22 @@ public class Unirest {
 	}
 
 	/**
-	 * Set the ObjectMapper implementation to use for Response to Object binding
-	 * 
-	 * @param objectMapper Custom implementation of ObjectMapper interface
-	 */
+		* Set the ObjectMapper implementation to use for Response to Object binding
+		*
+		* @param objectMapper Custom implementation of ObjectMapper interface
+		*/
 	public static void setObjectMapper(ObjectMapper objectMapper) {
 		Options.setOption(Option.OBJECT_MAPPER, objectMapper);
-
 		// Reload the client implementations
 		Options.refresh();
 	}
 
 	/**
-	 * Set the connection timeout and socket timeout
-	 * 
-	 * @param connectionTimeout The timeout until a connection with the server is established (in milliseconds). Default is 10000. Set to zero to disable the timeout.
-	 * @param socketTimeout The timeout to receive data (in milliseconds). Default is 60000. Set to zero to disable the timeout.
-	 */
+		* Set the connection timeout and socket timeout
+		*
+		* @param connectionTimeout The timeout until a connection with the server is established (in milliseconds). Default is 10000. Set to zero to disable the timeout.
+		* @param socketTimeout The timeout to receive data (in milliseconds). Default is 60000. Set to zero to disable the timeout.
+		*/
 	public static void setTimeouts(long connectionTimeout, long socketTimeout) {
 		Options.setOption(Option.CONNECTION_TIMEOUT, connectionTimeout);
 		Options.setOption(Option.SOCKET_TIMEOUT, socketTimeout);
@@ -95,11 +83,11 @@ public class Unirest {
 	}
 
 	/**
-	 * Set the concurrency levels
-	 * 
-	 * @param maxTotal Defines the overall connection limit for a connection pool. Default is 200.
-	 * @param maxPerRoute Defines a connection limit per one HTTP route (this can be considered a per target host limit). Default is 20.
-	 */
+		* Set the concurrency levels
+		*
+		* @param maxTotal Defines the overall connection limit for a connection pool. Default is 200.
+		* @param maxPerRoute Defines a connection limit per one HTTP route (this can be considered a per target host limit). Default is 20.
+		*/
 	public static void setConcurrency(int maxTotal, int maxPerRoute) {
 		Options.setOption(Option.MAX_TOTAL, maxTotal);
 		Options.setOption(Option.MAX_PER_ROUTE, maxPerRoute);
@@ -109,15 +97,15 @@ public class Unirest {
 	}
 
 	/**
-	 * Clear default headers
-	 */
+		* Clear default headers
+		*/
 	public static void clearDefaultHeaders() {
 		Options.setOption(Option.DEFAULT_HEADERS, null);
 	}
 
 	/**
-	 * Set default header
-	 */
+		* Set default header
+		*/
 	@SuppressWarnings("unchecked")
 	public static void setDefaultHeader(String name, String value) {
 		Object headers = Options.getOption(Option.DEFAULT_HEADERS);
@@ -126,33 +114,6 @@ public class Unirest {
 		}
 		((Map<String, String>) headers).put(name, value);
 		Options.setOption(Option.DEFAULT_HEADERS, headers);
-	}
-
-	/**
-	 * Close the asynchronous client and its event loop. Use this method to close all the threads and allow an application to exit.
-	 */
-	public static void shutdown() throws IOException {
-		// Closing the Sync HTTP client
-		CloseableHttpClient syncClient = (CloseableHttpClient) Options.getOption(Option.HTTPCLIENT);
-		if (syncClient != null) {
-			syncClient.close();
-		}
-
-		SyncIdleConnectionMonitorThread syncIdleConnectionMonitorThread = (SyncIdleConnectionMonitorThread) Options.getOption(Option.SYNC_MONITOR);
-		if (syncIdleConnectionMonitorThread != null) {
-			syncIdleConnectionMonitorThread.interrupt();
-		}
-
-		// Closing the Async HTTP client (if running)
-		CloseableHttpAsyncClient asyncClient = (CloseableHttpAsyncClient) Options.getOption(Option.ASYNCHTTPCLIENT);
-		if (asyncClient != null && asyncClient.isRunning()) {
-			asyncClient.close();
-		}
-
-		AsyncIdleConnectionMonitorThread asyncMonitorThread = (AsyncIdleConnectionMonitorThread) Options.getOption(Option.ASYNC_MONITOR);
-		if (asyncMonitorThread != null) {
-			asyncMonitorThread.interrupt();
-		}
 	}
 
 	public static GetRequest get(String url) {
@@ -184,3 +145,4 @@ public class Unirest {
 	}
 
 }
+

@@ -23,7 +23,18 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.mashape.unirest.http;
+package com.mashape.unirest.android.http;
+
+import com.mashape.unirest.android.http.options.Option;
+import com.mashape.unirest.android.http.options.Options;
+import com.mashape.unirest.http.HttpMethod;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.android.http.utils.ClientFactory;
+import com.mashape.unirest.android.request.HttpRequest;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.*;
+import org.apache.http.nio.entity.NByteArrayEntity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,117 +45,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.concurrent.FutureCallback;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.nio.entity.NByteArrayEntity;
-
-import com.mashape.unirest.http.async.Callback;
-import com.mashape.unirest.http.async.utils.AsyncIdleConnectionMonitorThread;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.http.options.Option;
-import com.mashape.unirest.http.options.Options;
-import com.mashape.unirest.http.utils.ClientFactory;
-import com.mashape.unirest.request.HttpRequest;
 
 public class HttpClientHelper {
 
 	private static final String CONTENT_TYPE = "content-type";
 	private static final String ACCEPT_ENCODING_HEADER = "accept-encoding";
 	private static final String USER_AGENT_HEADER = "user-agent";
-	private static final String USER_AGENT = "unirest-java/1.3.11";
-
-	private static <T> FutureCallback<org.apache.http.HttpResponse> prepareCallback(final Class<T> responseClass, final Callback<T> callback) {
-		if (callback == null)
-			return null;
-
-		return new FutureCallback<org.apache.http.HttpResponse>() {
-
-			public void cancelled() {
-				callback.cancelled();
-			}
-
-			public void completed(org.apache.http.HttpResponse arg0) {
-				callback.completed(new HttpResponse<T>(arg0, responseClass));
-			}
-
-			public void failed(Exception arg0) {
-				callback.failed(new UnirestException(arg0));
-			}
-
-		};
-	}
-
-	public static <T> Future<HttpResponse<T>> requestAsync(HttpRequest request, final Class<T> responseClass, Callback<T> callback) {
-		HttpUriRequest requestObj = prepareRequest(request, true);
-
-		CloseableHttpAsyncClient asyncHttpClient = ClientFactory.getAsyncHttpClient();
-		if (!asyncHttpClient.isRunning()) {
-			asyncHttpClient.start();
-			AsyncIdleConnectionMonitorThread asyncIdleConnectionMonitorThread = (AsyncIdleConnectionMonitorThread) Options.getOption(Option.ASYNC_MONITOR);
-			asyncIdleConnectionMonitorThread.start();
-		}
-
-		final Future<org.apache.http.HttpResponse> future = asyncHttpClient.execute(requestObj, prepareCallback(responseClass, callback));
-
-		return new Future<HttpResponse<T>>() {
-
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				return future.cancel(mayInterruptIfRunning);
-			}
-
-			public boolean isCancelled() {
-				return future.isCancelled();
-			}
-
-			public boolean isDone() {
-				return future.isDone();
-			}
-
-			public HttpResponse<T> get() throws InterruptedException, ExecutionException {
-				org.apache.http.HttpResponse httpResponse = future.get();
-				return new HttpResponse<T>(httpResponse, responseClass);
-			}
-
-			public HttpResponse<T> get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-				org.apache.http.HttpResponse httpResponse = future.get(timeout, unit);
-				return new HttpResponse<T>(httpResponse, responseClass);
-			}
-		};
-	}
-
-	public static <T> HttpResponse<T> request(HttpRequest request, Class<T> responseClass) throws UnirestException {
-		HttpRequestBase requestObj = prepareRequest(request, false);
-		HttpClient client = ClientFactory.getHttpClient(); // The
-															// DefaultHttpClient
-															// is thread-safe
-
-		org.apache.http.HttpResponse response;
-		try {
-			response = client.execute(requestObj);
-			HttpResponse<T> httpResponse = new HttpResponse<T>(response, responseClass);
-			requestObj.releaseConnection();
-			return httpResponse;
-		} catch (Exception e) {
-			throw new UnirestException(e);
-		} finally {
-			requestObj.releaseConnection();
-		}
-	}
+	private static final String USER_AGENT = "unirest-java/1.4.9";
 
 	private static HttpRequestBase prepareRequest(HttpRequest request, boolean async) {
 
@@ -194,10 +101,10 @@ public class HttpClientHelper {
 			reqObj = new HttpPut(urlToRequest);
 			break;
 		case DELETE:
-			reqObj = new HttpDeleteWithBody(urlToRequest);
+			//reqObj = new HttpDeleteWithBody(urlToRequest);
 			break;
 		case PATCH:
-			reqObj = new HttpPatchWithBody(urlToRequest);
+			//reqObj = new HttpPatchWithBody(urlToRequest);
 			break;
 		case OPTIONS:
 			reqObj = new HttpOptions(urlToRequest);
@@ -240,6 +147,22 @@ public class HttpClientHelper {
 		}
 
 		return reqObj;
+	}
+
+	public static <T> HttpResponse<T> request(HttpRequest request, Class<T> responseClass) throws UnirestException {
+		HttpRequestBase requestObj = prepareRequest(request, false);
+		HttpClient client = ClientFactory.getHttpClient(); // The
+		// DefaultHttpClient
+		// is thread-safe
+
+		org.apache.http.HttpResponse response;
+		try {
+			response = client.execute(requestObj);
+			HttpResponse<T> httpResponse = new HttpResponse<T>(response, responseClass);
+			return httpResponse;
+		} catch (Exception e) {
+			throw new UnirestException(e);
+		}
 	}
 
 }

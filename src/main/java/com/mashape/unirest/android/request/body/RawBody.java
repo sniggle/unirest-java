@@ -23,30 +23,24 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.mashape.unirest.request.body;
+package com.mashape.unirest.android.request.body;
 
+import com.mashape.unirest.android.request.BaseRequest;
+import com.mashape.unirest.android.request.HttpRequest;
+import com.mashape.unirest.request.body.Body;
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.ByteArrayEntity;
 
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.request.BaseRequest;
-import com.mashape.unirest.request.HttpRequest;
+public class RawBody extends BaseRequest implements Body {
 
-public class RequestBodyEntity extends BaseRequest implements Body {
+	private byte[] body;
 
-	private Object body;
-
-	public RequestBodyEntity(HttpRequest httpRequest) {
+	public RawBody(HttpRequest httpRequest) {
 		super(httpRequest);
 	}
 
-	public RequestBodyEntity body(String body) {
+	public RawBody body(byte[] body) {
 		this.body = body;
-		return this;
-	}
-
-	public RequestBodyEntity body(JsonNode body) {
-		this.body = body.toString();
 		return this;
 	}
 
@@ -55,7 +49,6 @@ public class RequestBodyEntity extends BaseRequest implements Body {
 	}
 
 	public HttpEntity getEntity() {
-		return new StringEntity(body.toString(), UTF_8);
+		return new ByteArrayEntity(body);
 	}
-
 }

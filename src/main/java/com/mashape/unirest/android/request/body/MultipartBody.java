@@ -23,37 +23,22 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.mashape.unirest.request.body;
+package com.mashape.unirest.android.request.body;
+
+import com.mashape.unirest.android.request.BaseRequest;
+import com.mashape.unirest.android.request.HttpRequest;
+import com.mashape.unirest.request.body.Body;
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.content.*;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.ByteArrayBody;
-import org.apache.http.entity.mime.content.ContentBody;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.InputStreamBody;
-import org.apache.http.entity.mime.content.StringBody;
-
-import com.mashape.unirest.http.utils.MapUtil;
-import com.mashape.unirest.request.BaseRequest;
-import com.mashape.unirest.request.HttpRequest;
+import java.util.*;
 
 public class MultipartBody extends BaseRequest implements Body {
 	private Map<String, List<Object>> parameters = new LinkedHashMap<String, List<Object>>();
-	private Map<String, ContentType> contentTypes = new HashMap<String, ContentType>();
+	private Map<String, String> contentTypes = new HashMap<String, String>();
 
 	private boolean hasFile;
 	private HttpRequest httpRequestObj;
@@ -94,14 +79,13 @@ public class MultipartBody extends BaseRequest implements Body {
 			list = new LinkedList<Object>();
 		list.add(value);
 		parameters.put(name, list);
-
-		ContentType type = null;
+		String type;
 		if (contentType != null && contentType.length() > 0) {
-			type = ContentType.parse(contentType);
+			type = contentType;
 		} else if (file) {
-			type = ContentType.APPLICATION_OCTET_STREAM;
+			type = "application/octet-stream";
 		} else {
-			type = ContentType.APPLICATION_FORM_URLENCODED.withCharset(UTF_8);
+			type = "application/form-urlencoded:UTF8";
 		}
 		contentTypes.put(name, type);
 
@@ -120,20 +104,12 @@ public class MultipartBody extends BaseRequest implements Body {
 		return field(name, file, true, contentType);
 	}
 
-	public MultipartBody field(String name, InputStream stream, ContentType contentType, String fileName) {
-		return field(name, new InputStreamBody(stream, contentType, fileName), true, contentType.getMimeType());
+	public MultipartBody field(String name, InputStream stream, String contentType, String fileName) {
+		return field(name, new InputStreamBody(stream, contentType, fileName), true, contentType);
 	}
 
 	public MultipartBody field(String name, InputStream stream, String fileName) {
-		return field(name, new InputStreamBody(stream, ContentType.APPLICATION_OCTET_STREAM, fileName), true, ContentType.APPLICATION_OCTET_STREAM.getMimeType());
-	}
-
-	public MultipartBody field(String name, byte[] bytes, ContentType contentType, String fileName) {
-		return field(name, new ByteArrayBody(bytes, contentType, fileName), true, contentType.getMimeType());
-	}
-
-	public MultipartBody field(String name, byte[] bytes, String fileName) {
-		return field(name, new ByteArrayBody(bytes, ContentType.APPLICATION_OCTET_STREAM, fileName), true, ContentType.APPLICATION_OCTET_STREAM.getMimeType());
+		return field(name, new InputStreamBody(stream, "application/octet-stream", fileName), true, "application/octet-stream");
 	}
 
 	public MultipartBody basicAuth(String username, String password) {
@@ -147,6 +123,7 @@ public class MultipartBody extends BaseRequest implements Body {
 	}
 
 	public HttpEntity getEntity() {
+		/*
 		if (hasFile) {
 			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
 			if (mode != null) {
@@ -176,6 +153,8 @@ public class MultipartBody extends BaseRequest implements Body {
 				throw new RuntimeException(e);
 			}
 		}
+		*/
+		return null;
 	}
 
 }

@@ -23,15 +23,17 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.mashape.unirest.http;
+package com.mashape.unirest.android.http;
 
-import com.mashape.unirest.http.options.Option;
-import com.mashape.unirest.http.options.Options;
+import com.mashape.unirest.android.http.options.Option;
+import com.mashape.unirest.android.http.options.Options;
+import com.mashape.unirest.http.Headers;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.utils.ResponseUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
-import org.apache.http.util.EntityUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -106,8 +108,8 @@ public class HttpResponse<T> {
 				throw new RuntimeException(e);
 			}
 		}
-		
-		EntityUtils.consumeQuietly(responseEntity);
+
+		//EntityUtils.consumeQuietly(responseEntity);
 	}
 
 	public int getStatus() {

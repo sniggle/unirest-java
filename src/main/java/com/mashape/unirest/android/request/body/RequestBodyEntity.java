@@ -23,23 +23,32 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.mashape.unirest.request.body;
+package com.mashape.unirest.android.request.body;
 
-import com.mashape.unirest.request.BaseRequest;
-import com.mashape.unirest.request.HttpRequest;
+import com.mashape.unirest.android.request.BaseRequest;
+import com.mashape.unirest.android.request.HttpRequest;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.request.body.Body;
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.StringEntity;
 
-public class RawBody extends BaseRequest implements Body {
+import java.io.UnsupportedEncodingException;
 
-	private byte[] body;
+public class RequestBodyEntity extends BaseRequest implements Body {
 
-	public RawBody(HttpRequest httpRequest) {
+	private Object body;
+
+	public RequestBodyEntity(HttpRequest httpRequest) {
 		super(httpRequest);
 	}
 
-	public RawBody body(byte[] body) {
+	public RequestBodyEntity body(String body) {
 		this.body = body;
+		return this;
+	}
+
+	public RequestBodyEntity body(JsonNode body) {
+		this.body = body.toString();
 		return this;
 	}
 
@@ -48,6 +57,11 @@ public class RawBody extends BaseRequest implements Body {
 	}
 
 	public HttpEntity getEntity() {
-		return new ByteArrayEntity(body);
+		try {
+			return new StringEntity(body.toString(), UTF_8);
+		} catch (UnsupportedEncodingException e) {
+			return null;
+		}
 	}
+
 }

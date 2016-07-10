@@ -23,20 +23,17 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.mashape.unirest.request;
+package com.mashape.unirest.android.request;
 
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.content.InputStreamBody;
-
+import com.mashape.unirest.android.http.options.Option;
+import com.mashape.unirest.android.http.options.Options;
 import com.mashape.unirest.http.HttpMethod;
+import com.mashape.unirest.android.request.body.MultipartBody;
+import com.mashape.unirest.android.request.body.RawBody;
+import com.mashape.unirest.android.request.body.RequestBodyEntity;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.ObjectMapper;
-import com.mashape.unirest.http.options.Option;
-import com.mashape.unirest.http.options.Options;
-import com.mashape.unirest.request.body.MultipartBody;
-import com.mashape.unirest.request.body.RawBody;
-import com.mashape.unirest.request.body.RequestBodyEntity;
-
+import org.apache.http.entity.mime.content.InputStreamBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -125,15 +122,15 @@ public class HttpRequestWithBody extends HttpRequest {
 		return body;
 	}
 
-	public MultipartBody field(String name, InputStream stream, ContentType contentType, String fileName) {
+	public MultipartBody field(String name, InputStream stream, String contentType, String fileName) {
 		InputStreamBody inputStreamBody = new InputStreamBody(stream, contentType, fileName);
-		MultipartBody body = new MultipartBody(this).field(name, inputStreamBody, true, contentType.toString());
+		MultipartBody body = new MultipartBody(this).field(name, inputStreamBody, true, contentType);
 		this.body = body;
 		return body;
 	}
 
 	public MultipartBody field(String name, InputStream stream, String fileName) {
-		MultipartBody body = field(name, stream, ContentType.APPLICATION_OCTET_STREAM, fileName);
+		MultipartBody body = field(name, stream, "application/octet-stream", fileName);
 		this.body = body;
 		return body;
 	}
@@ -150,11 +147,9 @@ public class HttpRequestWithBody extends HttpRequest {
 
 	public RequestBodyEntity body(Object body) {
 		ObjectMapper objectMapper = (ObjectMapper) Options.getOption(Option.OBJECT_MAPPER);
-
 		if (objectMapper == null) {
 			throw new RuntimeException("Serialization Impossible. Can't find an ObjectMapper implementation.");
 		}
-
 		return body(objectMapper.writeValue(body));
 	}
 

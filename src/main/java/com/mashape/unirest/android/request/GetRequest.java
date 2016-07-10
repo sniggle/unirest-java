@@ -23,11 +23,17 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.mashape.unirest.request;
+package com.mashape.unirest.android.request;
 
-import java.util.Map;
-
+import android.content.Context;
+import android.content.Loader;
+import com.mashape.unirest.android.util.GetRequestAsyncLoader;
 import com.mashape.unirest.http.HttpMethod;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.exceptions.UnirestException;
+
+import java.io.InputStream;
+import java.util.Map;
 
 public class GetRequest extends HttpRequest {
 
@@ -38,6 +44,11 @@ public class GetRequest extends HttpRequest {
 	public GetRequest routeParam(String name, String value) {
 		super.routeParam(name, value);
 		return this;
+	}
+
+	@Override
+	public GetRequest with(Context context) {
+		return (GetRequest)super.with(context);
 	}
 
 	@Override
@@ -55,4 +66,21 @@ public class GetRequest extends HttpRequest {
 		super.basicAuth(username, password);
 		return this;
 	}
+
+	public Loader<String> asStringLoader() {
+		 return new GetRequestAsyncLoader<String>(context, this, String.class);
+	}
+
+	public Loader<JsonNode> asJsonLoader() throws UnirestException {
+		return new GetRequestAsyncLoader<JsonNode>(context, this, JsonNode.class);
+	}
+
+	public <T> Loader<T> asObjectLoader(Class<T> responseClass) throws UnirestException {
+		 return new GetRequestAsyncLoader<T>(context, this, responseClass);
+	}
+
+	public Loader<InputStream> asBinary() throws UnirestException {
+			return new GetRequestAsyncLoader<InputStream>(context, this, InputStream.class);
+	}
+
 }
